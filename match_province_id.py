@@ -1,6 +1,8 @@
 
 import os
+import re
 from pathlib import Path
+
 
 
 terrain_file_path = Path("map/terrain.txt")
@@ -12,22 +14,16 @@ terrain_id = []
 continent_id = []
 area_id = []
 trade_nodes_id = []
-terrain_present = False
-continent_present = False
-area_present = False
-trade_nodes_present = False
+terrain_present = terrain_file_path.is_file()
+continent_present = continent_file_path.is_file()
+area_present = area_file_path.is_file()
+trade_nodes_present = trade_nodes_file_path.is_file()
 
 
-if terrain_file_path.is_file():
-    terrain_present = True
-if continent_file_path.is_file():
-    continent_present = True
-if area_file_path.is_file():
-    area_present = True
-if trade_nodes_file_path.is_file():
-    trade_nodes_present = True
-else:
-    pass
+def natural_sort(l):
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    return sorted(l, key=alphanum_key)
 
 
 def terrain_file():
@@ -138,10 +134,15 @@ def find_duplicate(province_id):
 
 def province_history_files(province_history_path):
     province_history_names = [f.name for f in os.scandir(province_history_path) if f.is_file()]
-    province_history_id = [x[:4] for x in province_history_names]
-    province_history_id = [x.replace('-', '').replace(' ', '') for x in province_history_id]
+    province_history_id = [x[:4].replace('-', '').replace(' ', '') for x in province_history_names]
     return province_history_id
-    
+
+
+def province_history_files_name(province_history_path):
+    province_history_names = [f.name for f in os.scandir(province_history_path) if f.is_file()]
+    province_history_names = [x.replace('-', '').replace('.txt', '') for x in province_history_names]
+    return province_history_names
+
 
 def missing_province_id(province_history_id,province_id):
     missing_id = list(set(province_history_id).difference(province_id))
@@ -154,33 +155,33 @@ if province_history_path.is_dir():
     if terrain_present is True:
         file_output = terrain_file()
         province_id = filter_list(file_output)
+        duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id, province_id)
-        missing_id = missing_province_id(province_history_id, province_id)
-        duplicate = find_duplicate(province_id)
+        missing_id = natural_sort(missing_province_id(province_history_id, province_id))
         print(f"Terrain.txt Missing id:{missing_id}{os.linesep}Duplicate id:{duplicate}{os.linesep}")
     if continent_present is True:
         file_output = continent_file()
         province_id = filter_list(file_output)
         continent_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id, province_id)
-        missing_id = missing_province_id(province_history_id, province_id)
+        missing_id = natural_sort(missing_province_id(province_history_id, province_id))
         print(f"Continent.txt Missing id: {missing_id}{os.linesep}Duplicate id:{duplicate}{os.linesep}")
     if area_present is True:
         file_output = area_file()
         province_id = filter_list(file_output)
         area_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id,province_id)
-        missing_id = missing_province_id(province_history_id, province_id)
+        missing_id = natural_sort(missing_province_id(province_history_id, province_id))
         print(f"Area.txt Missing id: {missing_id}{os.linesep}Duplicate id:{duplicate}{os.linesep}")
     if trade_nodes_present is True:
         file_output = trade_nodes_file()
         province_id = filter_list(file_output)
         trade_nodes_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id, province_id)
-        missing_id = missing_province_id(province_history_id, province_id)
+        missing_id = natural_sort(missing_province_id(province_history_id, province_id))
         print(f"TradeNodes.txt Missing id: {missing_id}{os.linesep}Duplicate id:{duplicate}{os.linesep}")
     else:
         pass
@@ -188,24 +189,54 @@ else:
     if terrain_present is True:
         file_output = terrain_file()
         province_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         print(f"Terrain.txt Duplicate id:{duplicate}{os.linesep}")
     if continent_present is True:
         file_output = continent_file()
         province_id = filter_list(file_output)
         continent_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         print(f"Continent.txt Duplicate id:{duplicate}{os.linesep}")
     if area_present is True:
         file_output = area_file()
         province_id = filter_list(file_output)
         area_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(find_duplicate(province_id))
         print(f"Area.txt Duplicate id:{duplicate}{os.linesep}")
     if trade_nodes_present is True:
         file_output = trade_nodes_file()
         province_id = filter_list(file_output)
         trade_nodes_id = filter_list(file_output)
-        duplicate = find_duplicate(province_id)
+        duplicate = natural_sort(natural_sort(find_duplicate(province_id)))
         print(f"TradeNodes.txt Duplicate id:{duplicate}{os.linesep}")
+    else:
+        pass
 
+
+input_a = input("To print all history/province id's type 'id' or 'name'\nTo Save to a txt file type 'save id' or 'save name'\n")
+
+if input_a == "name":
+    province_history_names = province_history_files_name(province_history_path)
+    province_history_names = str(natural_sort(province_history_names))
+    print(province_history_names)
+
+if input_a == "id":
+    province_history_id = province_history_files(province_history_path)
+    province_history_id = str(natural_sort(province_history_id))
+    print(province_history_id)
+
+if input_a == "save name":
+    province_history_names = province_history_files_name(province_history_path)
+    province_history_names = str(natural_sort(province_history_names))
+    with open('province_id.txt', 'w+', encoding='utf8') as output:
+        output.write(province_history_names)
+    print("Saved")
+
+if input_a == "save id":
+    province_history_id = province_history_files(province_history_path)
+    province_history_id = str(natural_sort(province_history_id))
+    with open('province_id.txt', 'w+', encoding='utf8') as output:
+        output.write(province_history_id)
+    print("Saved")
+else:
+    pass
