@@ -418,6 +418,11 @@ if province_history_present is False:
         trade_nodes_id = trade_nodes_file()
         duplicate = natural_sort(find_duplicate(province_id))
         print(f"TradeNodes.txt Duplicate id:{duplicate}{os.linesep}")
+    if localisation_present is True:
+        id_line = localisation_files(localisation_file_path)
+        province_id = integer_filter(id_line)
+        duplicate = natural_sort(find_duplicate(province_id))
+        print(f"Localisation Duplicate id:{duplicate}{os.linesep}")
     else:
         pass
 else:
