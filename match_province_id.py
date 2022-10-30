@@ -122,6 +122,8 @@ def continent_file():
                 if end in line.strip():
                     found_type = False
                 else:
+                    comment = '#'
+                    line = line.split(comment, 1)[0]
                     temp_line = str(line).rstrip('\n').strip().split() 
                     province_id += temp_line
     return province_id
