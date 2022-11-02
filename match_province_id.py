@@ -35,6 +35,7 @@ def natural_sort(l):
 
 def definition_file():
     province_id = []
+    definition_names = []
     comment = '#'
     province = "province;red;green;blue;x;x"
     semicolon = ";"
@@ -44,21 +45,11 @@ def definition_file():
             line = line.split(comment, 1)[0].replace(province, "").removesuffix(";")
             id_line = line.split(semicolon, 1)[0].split('\n')
             province_id += id_line
-    return province_id
-
-
-def definition_file_input():
-    definition_names = []
-    comment = '#'
-    province = "province;red;green;blue;x;x"
-    path = definition_file_path
-    with open(path) as file:
-        while line := file.readline().rstrip().replace('\t', '').replace('\n', '').replace(' ', ''):
-            line = line.split(comment, 1)[0].replace(province, "").removesuffix(";").replace(";", " ")
-            id_line = line.split('\n')
-            id_line[:] = [x for x in id_line if x]
-            definition_names += id_line
-    return definition_names
+            line = line.replace(";", " ")
+            name_line = line.split('\n')
+            name_line = [x for x in name_line if x]
+            definition_names += name_line
+    return province_id, definition_names
 
 
 def position_file():
@@ -121,7 +112,7 @@ def read_from_file(start, end, path):
     return province_id
 
 
-def climate_file(climate_file_path):
+def climate_file():
     wasteland_id = []
     start_wasteland = 'impassable = {'
     end = '}'
@@ -144,7 +135,7 @@ def climate_file(climate_file_path):
     return wasteland_id
 
 
-def default_file(default_file_path):
+def default_file():
     sea_or_lake_id = []
     start_sea = 'sea_starts = {'
     start_lake = 'lakes = {'
@@ -172,7 +163,7 @@ def default_file(default_file_path):
     return sea_or_lake_id
 
 
-def localisation_files(localisation_file_path):
+def localisation_files():
     folder = localisation_file_path
     files = os.listdir(folder)
     keyword = ' PROV'
@@ -196,7 +187,7 @@ def localisation_files(localisation_file_path):
 
 
 # Getting File names from history/provinces
-def province_history_files(province_history_path):
+def province_history_files():
     province_history_names = [f.name for f in os.scandir(province_history_path) if f.is_file()]
     province_history_id = [x.split('-', 1)[0].replace(' ', '') for x in province_history_names]
     province_history_names = [x.replace('-', '').replace('.txt', '') for x in province_history_names]
@@ -234,16 +225,16 @@ def missing_province_id(province_history_id,province_id):
 
 
 if default_present is True:
-    sea_or_lake_id = default_file(default_file_path)
+    sea_or_lake_id = default_file()
 if climate_present is True:
-    wasteland_id = climate_file(climate_file_path)
+    wasteland_id = climate_file()
 
 
 if province_history_present is True:
-    province_history_id, province_history_names = province_history_files(province_history_path)
+    province_history_id, province_history_names = province_history_files()
     print("Loading File names from history/provinces/")
     if definition_present is True:
-        province_id = definition_file()
+        province_id, definition_names = definition_file()
         duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id, province_id)
         missing_id = natural_sort(missing_province_id(province_history_id, province_id))
@@ -283,7 +274,7 @@ if province_history_present is True:
         missing_id = natural_sort(filter_list(missing_province_id(province_history_id, province_id)))
         print(f"TradeNodes.txt Missing id: {missing_id}{os.linesep}Duplicate id:{duplicate}{os.linesep}")
     if localisation_present is True:
-        id_line, localisation_list = localisation_files(localisation_file_path)
+        id_line, localisation_list = localisation_files()
         province_id = integer_filter(id_line)
         duplicate = natural_sort(find_duplicate(province_id))
         missing_province_id(province_history_id, province_id)
@@ -321,7 +312,7 @@ if province_history_present is False:
         duplicate = natural_sort(find_duplicate(province_id))
         print(f"TradeNodes.txt Duplicate id:{duplicate}{os.linesep}")
     if localisation_present is True:
-        id_line, localisation_list = localisation_files(localisation_file_path)
+        id_line, localisation_list = localisation_files()
         province_id = integer_filter(id_line)
         duplicate = natural_sort(find_duplicate(province_id))
         print(f"Localisation Duplicate id:{duplicate}{os.linesep}")
@@ -343,8 +334,7 @@ if input_a == "loc":
     print(str(natural_sort(localisation_list)))
 
 if input_a == "def":
-    definition_names = str(natural_sort(definition_file_input()))
-    print(definition_names)
+    print(str(natural_sort(definition_names)))
 
 if input_a == "save loc":
     save_loc = str(natural_sort(localisation_list))
@@ -365,7 +355,7 @@ if input_a == "save id":
     print("Saved")
 
 if input_a == "save def":
-    definition_names = str(natural_sort(definition_file_input()))
+    definition_names = str(natural_sort(definition_names))
     with open('definition.txt', 'w', encoding='utf8') as output:
         output.write(definition_names)
     print("Saved")
