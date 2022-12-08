@@ -324,40 +324,27 @@ else:
 input_a = input("To print all history/province id's type: 'id', 'name', 'loc', 'def'\nTo Save to a txt file type: 'save id', "
                 "'save name', 'save loc', 'save def'\n")
 
-if input_a == "name":
-    print(str(natural_sort(province_history_names)))
+print_commands = {
+    "name": province_history_names,
+    "id": province_history_id,
+    "loc": localisation_list,
+    "def": definition_names
+}
 
-if input_a == "id":
-    print(str(natural_sort(province_history_id)))
+save_commands = {
+    "save name": province_history_names,
+    "save id": province_history_id,
+    "save loc": localisation_list,
+    "save def": definition_names
+}
 
-if input_a == "loc":
-    print(str(natural_sort(localisation_list)))
+if input_a in print_commands.keys():
+    print(str(natural_sort(print_commands.get(input_a))))
 
-if input_a == "def":
-    print(str(natural_sort(definition_names)))
-
-if input_a == "save loc":
-    save_loc = str(natural_sort(localisation_list))
-    with open('loc_names.txt', 'w', encoding='utf8') as output:
-        output.write(save_loc)
-    print("Saved")
-
-if input_a == "save name":
-    province_history_names = str(natural_sort(province_history_names))
-    with open('province_names.txt', 'w', encoding='utf8') as output:
-        output.write(province_history_names)
-    print("Saved")
-
-if input_a == "save id":
-    province_history_id = str(natural_sort(province_history_id))
+elif input_a in save_commands.keys():
+    save_output = str(natural_sort(save_commands.get(input_a)))
     with open('province_id.txt', 'w', encoding='utf8') as output:
-        output.write(province_history_id)
-    print("Saved")
-
-if input_a == "save def":
-    definition_names = str(natural_sort(definition_names))
-    with open('definition.txt', 'w', encoding='utf8') as output:
-        output.write(definition_names)
+        output.write(save_output)
     print("Saved")
 else:
     pass
