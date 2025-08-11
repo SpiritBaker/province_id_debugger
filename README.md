@@ -1,7 +1,7 @@
 # Province id's debugger
 
 Simple script for debugging Province id's for Eu4.
-Loads Province Id's from history/provinces, and looks up for Missing Id's and Duplicate Id's.
+Loads Province id's from history/provinces, and looks up for Missing id's and Duplicate id's.
 Sea tiles, lakes and wastelands id's are automatically filtered if the corresponding files are present.
 
 Requires Python to be installed.
